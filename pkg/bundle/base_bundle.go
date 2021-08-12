@@ -1,8 +1,6 @@
 package bundle
 
 import (
-	"fmt"
-
 	datatypes "github.com/open-cluster-management/hub-of-hubs-data-types"
 	"github.com/open-cluster-management/hub-of-hubs-spec-transport-bridge/pkg/helpers"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,28 +26,10 @@ type baseBundle struct {
 // AddObject adds an object to the bundle.
 func (b *baseBundle) AddObject(object metav1.Object, objectUID string) {
 	helpers.SetMetaDataAnnotation(object, datatypes.OriginOwnerReferenceAnnotation, objectUID)
-	b.Objects = append(b.Objects, b.manipulate(object))
+	b.Objects = append(b.Objects, object)
 }
 
 // AddObject adds a deleted object to the bundle.
 func (b *baseBundle) AddDeletedObject(object metav1.Object) {
-	b.DeletedObjects = append(b.DeletedObjects, b.manipulate(object))
-}
-
-func (b *baseBundle) manipulate(object metav1.Object) metav1.Object {
-	b.manipulateCustomFunc(object)
-	b.manipulateNameAndNamespace(object)
-
-	return object
-}
-
-// manipulate name and namespace to avoid collisions of resources with same name on different ns.
-// manipulate objects only if they were created on user namespaces. don't manipulate on hoh-system ns.
-func (b *baseBundle) manipulateNameAndNamespace(object metav1.Object) {
-	if object.GetNamespace() == datatypes.HohSystemNamespace {
-		return
-	}
-
-	object.SetName(fmt.Sprintf("%s-hoh-%s", object.GetName(), object.GetNamespace()))
-	object.SetNamespace(datatypes.HohSystemNamespace)
+	b.DeletedObjects = append(b.DeletedObjects, object)
 }
