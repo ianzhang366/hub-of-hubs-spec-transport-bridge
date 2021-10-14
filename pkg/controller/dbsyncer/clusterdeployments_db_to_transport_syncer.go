@@ -14,23 +14,24 @@ import (
 
 const (
 	clusterDeploymentTableName = "clusterdeployments"
-	clusterDeploymentMsgKey    = "clusterdeployments"
+	clusterDeploymentMsgKey    = "ClusterDeployments"
 )
 
 // AddClusterDeploymentsDBToTransportSyncer adds clusterdeployments db to transport syncer to the manager.
 func AddClusterDeploymentsDBToTransportSyncer(mgr ctrl.Manager, db db.HubOfHubsSpecDB, transport transport.Transport,
 	syncInterval time.Duration) error {
+	componentName := "clusterdeployments-db-to-transport-syncer"
 	if err := mgr.Add(&genericDBToTransportSyncer{
-		log:                ctrl.Log.WithName("clusterdeployments-db-to-transport-syncer"),
+		log:                ctrl.Log.WithName(componentName),
 		db:                 db,
 		dbTableName:        clusterDeploymentTableName,
 		transport:          transport,
 		transportBundleKey: clusterDeploymentMsgKey,
 		syncInterval:       syncInterval,
 		createObjFunc:      func() metav1.Object { return &cdv1.ClusterDeployment{} },
-		createBundleFunc:   bundle.NewBaseBundle,
+		createBundleFunc:   bundle.NewClusterLifecycleBundle,
 	}); err != nil {
-		return fmt.Errorf("failed to add db to transport syncer - %w", err)
+		return fmt.Errorf("failed to add %s db to transport syncer - %w", componentName, err)
 	}
 
 	return nil

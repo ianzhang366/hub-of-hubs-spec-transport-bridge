@@ -13,7 +13,6 @@ import (
 )
 
 const (
-	componentName        = "secrets-db-transport-syncer"
 	secretsSpecTableName = "secrets"
 	SecretMsgKey         = "Secrets"
 )
@@ -21,6 +20,7 @@ const (
 // AddSecretsDBToTransportSyncer adds secrets db to transport syncer to the manager.
 func AddSecretsDBToTransportSyncer(mgr ctrl.Manager, db db.HubOfHubsSpecDB, transport transport.Transport,
 	syncInterval time.Duration) error {
+	componentName := "secrets-db-transport-syncer"
 	if err := mgr.Add(&genericDBToTransportSyncer{
 		log:                ctrl.Log.WithName(componentName),
 		db:                 db,
