@@ -8,6 +8,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type Option func(*baseBundle)
+
+func WithManipulate(m func(object metav1.Object)) Option {
+	return func(b *baseBundle) {
+		b.manipulateCustomFunc = m
+	}
+}
+
 // NewBaseBundle creates a new base bundle with no data in it.
 func NewBaseBundle() Bundle {
 	return &baseBundle{
@@ -15,6 +23,21 @@ func NewBaseBundle() Bundle {
 		DeletedObjects:       make([]metav1.Object, 0),
 		manipulateCustomFunc: func(object metav1.Object) {},
 	}
+}
+
+// newBaseBundle creates a new base bundle with no data in it.
+func newBaseBundle(ops ...Option) Bundle {
+	b := &baseBundle{
+		Objects:              make([]metav1.Object, 0),
+		DeletedObjects:       make([]metav1.Object, 0),
+		manipulateCustomFunc: func(object metav1.Object) {},
+	}
+
+	for _, op := range ops {
+		op(b)
+	}
+
+	return b
 }
 
 // manipulate custom is used to manipulate specific fields that are relevant to the specific object

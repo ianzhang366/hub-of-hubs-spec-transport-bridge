@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	datatypes "github.com/open-cluster-management/hub-of-hubs-data-types"
 	"github.com/open-cluster-management/hub-of-hubs-spec-transport-bridge/pkg/bundle"
 	"github.com/open-cluster-management/hub-of-hubs-spec-transport-bridge/pkg/db"
 	"github.com/open-cluster-management/hub-of-hubs-spec-transport-bridge/pkg/transport"
@@ -16,6 +15,7 @@ import (
 const (
 	componentName        = "secrets-db-transport-syncer"
 	secretsSpecTableName = "secrets"
+	SecretMsgKey         = "Secrets"
 )
 
 // AddSecretsDBToTransportSyncer adds secrets db to transport syncer to the manager.
@@ -26,10 +26,10 @@ func AddSecretsDBToTransportSyncer(mgr ctrl.Manager, db db.HubOfHubsSpecDB, tran
 		db:                 db,
 		dbTableName:        secretsSpecTableName,
 		transport:          transport,
-		transportBundleKey: datatypes.SecretMsgKey,
+		transportBundleKey: SecretMsgKey,
 		syncInterval:       syncInterval,
 		createObjFunc:      func() metav1.Object { return &corev1.Secret{} },
-		createBundleFunc:   bundle.NewBaseBundle,
+		createBundleFunc:   bundle.NewClusterLifecycleBundle,
 	}); err != nil {
 		return fmt.Errorf("failed to add %s db to transport syncer - %w", componentName, err)
 	}
