@@ -18,3 +18,5 @@ type Bundle interface {
 	AddObject(object metav1.Object, objectUID string)
 	AddDeletedObject(object metav1.Object)
 }
+
+
