@@ -15,10 +15,5 @@ func NewClusterLifecycleBundle() Bundle {
 
 // make sure the object is put to the target namespace, specified in the annotation
 func putObjectInClcNamespace(object metav1.Object) {
-	a := object.GetAnnotations()
-	if len(a) == 0 || a[targetNamespace] == "" {
-		return
-	}
-
-	object.SetNamespace(a[targetNamespace])
+	object.SetNamespace(object.GetName())
 }
